@@ -60,13 +60,17 @@ Generate a report:
 python report.py --ticker AAPL --years 5
 ```
 
+Or adjust years:
+
+```bash
+python report.py --ticker AAPL --years 10
+```
+
 Or multiple:
 
 ```bash
 python report.py --tickers AAPL,MSFT,NVDA --years 5
 ```
-
-Default output folder depends on your `--out` setting.
 
 Typical outputs:
 
@@ -80,12 +84,19 @@ Export one ticker:
 python export_sqlite.py --ticker AAPL --years 5
 ```
 
-Export multiple tickers:
+Or adjust years:
+
+```bash
+python export_sqlite.py --ticker AAPL --years 10
+```
+
+Or multiple:
 
 ```bash
 python export_sqlite.py --tickers AAPL,MSFT,NVDA --years 5
 ```
 
+Outputs:
 * `outputs/sec_fin.db`
 
 ---
@@ -117,13 +128,13 @@ python export_sqlite.py --tickers AAPL,MSFT,NVDA --years 5
 
 Below is an example output for Apple (AAPL).
 
-# Apple Inc. - AAPL Automated Financial Analysis Report
+### Apple Inc. - AAPL Automated Financial Analysis Report
 
 - CIK: `0000320193`
 - Generated: 2026-01-12 00:53:47
 - Coverage: last 5 fiscal years
 
-## Highlights
+#### Highlights
 - Latest fiscal year: **FY2025** ended 2025-09-27.
 - Revenue: **416.2B** and 6.4% YoY.
 - Gross margin: **46.9%**.
@@ -132,7 +143,7 @@ Below is an example output for Apple (AAPL).
 - Free cash flow: **98.8B** and 23.7% of revenue.
 - Revenue increased vs prior year.
 
-## Charts
+#### Charts
 
 | | |
 |---|---|
@@ -141,7 +152,7 @@ Below is an example output for Apple (AAPL).
 | <b>Income statement levels</b><br><img src='output_reports/assets/AAPL/income_statement.png' width='100%'> | <b>Balance sheet snapshot</b><br><img src='output_reports/assets/AAPL/balance_sheet.png' width='100%'> |
 | <b>Cash flow quality</b><br><img src='output_reports/assets/AAPL/cash_quality.png' width='100%'> | <b>Return on equity</b><br><img src='output_reports/assets/AAPL/roe.png' width='100%'> |
 
-## Annual Financials Table
+#### Annual Financials Table
 USD in billions for level metrics
 |   fy | fiscal_year_end   |   revenue |   gross_profit |   operating_income |   net_income |   cfo |   capex |   fcf | revenue_yoy   | gross_margin   | operating_margin   | net_margin   | fcf_margin   |   cash |   equity |
 |-----:|:------------------|----------:|---------------:|-------------------:|-------------:|------:|--------:|------:|:--------------|:---------------|:-------------------|:-------------|:-------------|-------:|---------:|
@@ -151,7 +162,7 @@ USD in billions for level metrics
 | 2022 | 2022-09-24        |     394.3 |          170.8 |              119.4 |         99.8 | 122.2 |    10.7 | 111.4 | 7.8%          | 43.3%          | 30.3%              | 25.3%        | 28.3%        |   23.6 |     50.7 |
 | 2021 | 2021-09-25        |     365.8 |          152.8 |              108.9 |         94.7 | 104   |    11.1 |  93   | NA            | 41.8%          | 29.8%              | 25.9%        | 25.4%        |   34.9 |     63.1 |
 
-## XBRL Concept Map
+#### XBRL Concept Map
 
 | Metric | XBRL Concept |
 |---|---|
