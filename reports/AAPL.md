@@ -1,14 +1,31 @@
 # Apple Inc. (AAPL) Automated Financial Analysis Report
 
 - CIK: `0000320193`
-- Generated: 2026-01-11 23:20:24
+- Generated: 2026-01-11 23:29:04
 - Coverage: last 5 fiscal years
 
 ## Highlights
 - Latest fiscal year: **FY2025** (ended 2025-09-27).
-- Revenue: **416.2B**.
-- Free cash flow: **98.8B**.
+- Revenue: **416.2B** (6.4% YoY).
+- Gross margin: **46.9%**.
+- Operating margin: **32.0%**.
+- Net margin: **26.9%**.
+- Free cash flow: **98.8B** (23.7% of revenue).
 - Revenue increased vs prior year.
+
+## Charts
+
+### Revenue
+![Revenue](assets/AAPL/revenue.png)
+
+### Margins
+![Margins](assets/AAPL/margins.png)
+
+### Cash flow
+![Cash flow](assets/AAPL/cash_flow.png)
+
+### Revenue YoY
+![Revenue YoY](assets/AAPL/revenue_yoy.png)
 
 ## Annual Financials Table (USD in billions)
 |   fy | fiscal_year_end   |   revenue |   gross_profit |   operating_income |   net_income |   cfo |   capex |   fcf | revenue_yoy   | gross_margin   | operating_margin   | net_margin   | fcf_margin   |   cash |   equity |

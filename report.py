@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import os
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
@@ -11,11 +10,8 @@ import pandas as pd
 
 from sec_client import make_default_client
 from xbrl_normalize import normalize_pipeline
-from financials import (
-    FinancialsConfig,
-    build_annual_financials_table,
-    format_financials_for_display,
-)
+from financials import FinancialsConfig, build_annual_financials_table, format_financials_for_display
+from viz import save_financial_charts
 
 
 # -----------------------------
@@ -48,6 +44,14 @@ def _safe_float(x) -> Optional[float]:
         return None
 
 
+def _fmt_date(x) -> str:
+    if isinstance(x, pd.Timestamp):
+        return str(x.date())
+    if x is None or (isinstance(x, float) and pd.isna(x)):
+        return "NA"
+    return str(x)
+
+
 def _as_markdown_table(df: pd.DataFrame) -> str:
     if df.empty:
         return "_No data._"
@@ -57,21 +61,15 @@ def _as_markdown_table(df: pd.DataFrame) -> str:
 # -----------------------------
 # Insights
 # -----------------------------
-def _make_insights(display_df: pd.DataFrame, raw_df: pd.DataFrame) -> str:
-    """
-    display_df: scaled to billions for numeric lines
-    raw_df: unscaled, used for comparisons if needed
-    """
+def _make_insights(display_df: pd.DataFrame) -> str:
     if display_df.empty:
         return "- No data available."
 
-    # Use the last row as "latest"
     latest = display_df.iloc[-1]
     prev = display_df.iloc[-2] if len(display_df) >= 2 else None
 
     fy = _safe_float(latest.get("fy"))
-    end = latest.get("fiscal_year_end")
-    end_str = str(end.date()) if isinstance(end, pd.Timestamp) else str(end)
+    end = _fmt_date(latest.get("fiscal_year_end"))
 
     rev = _safe_float(latest.get("revenue"))
     rev_yoy = _safe_float(latest.get("revenue_yoy"))
@@ -83,7 +81,7 @@ def _make_insights(display_df: pd.DataFrame, raw_df: pd.DataFrame) -> str:
 
     lines = []
     if fy is not None:
-        lines.append(f"- Latest fiscal year: **FY{int(fy)}** (ended {end_str}).")
+        lines.append(f"- Latest fiscal year: **FY{int(fy)}** (ended {end}).")
     if rev is not None:
         if rev_yoy is not None:
             lines.append(f"- Revenue: **{_num(rev)}B** ({_pct(rev_yoy)} YoY).")
@@ -101,7 +99,6 @@ def _make_insights(display_df: pd.DataFrame, raw_df: pd.DataFrame) -> str:
         else:
             lines.append(f"- Free cash flow: **{_num(fcf)}B**.")
 
-    # A simple trend comment if we have at least 2 years of revenue
     if prev is not None:
         prev_rev = _safe_float(prev.get("revenue"))
         if rev is not None and prev_rev is not None:
@@ -125,13 +122,16 @@ def build_report_markdown(
     years: int = 5,
     out_dir: str = "reports",
     include_concept_map: bool = True,
+    generate_charts: bool = True,
 ) -> Tuple[str, str]:
     """
     Returns (md_text, output_path)
     """
     ticker = ticker.strip().upper()
-    out_path = Path(out_dir) / f"{ticker}.md"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_root = Path(out_dir)
+    out_root.mkdir(parents=True, exist_ok=True)
+
+    out_path = out_root / f"{ticker}.md"
 
     c = make_default_client()
     cik = c.ticker_to_cik(ticker)
@@ -143,9 +143,17 @@ def build_report_markdown(
 
     cfg = FinancialsConfig(last_n_years=years)
     raw_table = build_annual_financials_table(df, cfg=cfg)
-
-    # For the markdown table we want readability
     display_table = format_financials_for_display(raw_table)
+
+    # Generate charts and compute relative paths for markdown
+    charts: Dict[str, str] = {}
+    if generate_charts and not display_table.empty:
+        asset_dir = out_root / "assets" / ticker
+        charts = save_financial_charts(display_table, str(asset_dir))
+
+    def _rel_path(p: str) -> str:
+        # markdown file is in out_root, so we want relative paths from out_root
+        return str(Path(p).relative_to(out_root)).replace("\\", "/")
 
     # Keep a clean column order if present
     preferred_cols = [
@@ -166,38 +174,40 @@ def build_report_markdown(
         "cash",
         "equity",
     ]
-    cols = [c for c in preferred_cols if c in display_table.columns] + [
-        c for c in display_table.columns if c not in preferred_cols
+    cols = [col for col in preferred_cols if col in display_table.columns] + [
+        col for col in display_table.columns if col not in preferred_cols
     ]
     display_table = display_table[cols].copy()
 
-    # Format display columns for markdown readability
-    # Numbers are already scaled for USD lines; we still format percent columns.
-    percent_cols = ["revenue_yoy", "gross_margin", "operating_margin", "net_margin", "fcf_margin"]
-    for col in percent_cols:
-        if col in display_table.columns:
-            display_table[col] = display_table[col].apply(lambda x: _pct(_safe_float(x)) if x is not None else "NA")
-
-    # Keep FY as int string
+    # Convert to markdown-friendly strings
     if "fy" in display_table.columns:
         display_table["fy"] = display_table["fy"].apply(
             lambda x: f"{int(x)}" if _safe_float(x) is not None else "NA"
         )
-
-    # Fiscal year end as YYYY-MM-DD
     if "fiscal_year_end" in display_table.columns:
-        def _fmt_date(x):
-            if isinstance(x, pd.Timestamp):
-                return str(x.date())
-            return "NA" if (x is None or (isinstance(x, float) and pd.isna(x))) else str(x)
-
         display_table["fiscal_year_end"] = display_table["fiscal_year_end"].apply(_fmt_date)
 
-    # Numeric columns (billions) formatting
-    billions_cols = ["revenue", "gross_profit", "operating_income", "net_income", "cfo", "capex", "fcf", "cash", "equity"]
+    # Numeric columns in billions
+    billions_cols = [
+        "revenue",
+        "gross_profit",
+        "operating_income",
+        "net_income",
+        "cfo",
+        "capex",
+        "fcf",
+        "cash",
+        "equity",
+    ]
     for col in billions_cols:
         if col in display_table.columns:
             display_table[col] = display_table[col].apply(lambda x: _num(_safe_float(x), digits=1))
+
+    # Percent columns
+    percent_cols = ["revenue_yoy", "gross_margin", "operating_margin", "net_margin", "fcf_margin"]
+    for col in percent_cols:
+        if col in display_table.columns:
+            display_table[col] = display_table[col].apply(lambda x: _pct(_safe_float(x), digits=1))
 
     md_lines = []
     md_lines.append(f"# {company_name} ({ticker}) Automated Financial Analysis Report")
@@ -208,8 +218,30 @@ def build_report_markdown(
     md_lines.append("")
 
     md_lines.append("## Highlights")
-    md_lines.append(_make_insights(display_table, raw_table))
+    md_lines.append(_make_insights(format_financials_for_display(raw_table)))
     md_lines.append("")
+
+    if charts:
+        md_lines.append("## Charts")
+        md_lines.append("")
+        order = ["revenue", "margins", "cash_flow", "revenue_yoy"]
+        titles = {
+            "revenue": "Revenue",
+            "margins": "Margins",
+            "cash_flow": "Cash flow",
+            "revenue_yoy": "Revenue YoY",
+        }
+        for k in order:
+            if k in charts:
+                title = titles[k]
+                md_lines.append(f"### {title}")
+                md_lines.append(f"![{title}]({_rel_path(charts[k])})")
+                md_lines.append("")
+    else:
+        md_lines.append("## Charts")
+        md_lines.append("")
+        md_lines.append("_No charts generated._")
+        md_lines.append("")
 
     md_lines.append("## Annual Financials Table (USD in billions)")
     md_lines.append(_as_markdown_table(display_table))
@@ -242,13 +274,16 @@ def main() -> None:
     parser.add_argument("--years", type=int, default=5, help="Number of fiscal years to include")
     parser.add_argument("--out", default="reports", help="Output directory")
     parser.add_argument("--no-concept-map", action="store_true", help="Do not include concept map section")
+    parser.add_argument("--no-charts", action="store_true", help="Do not generate charts")
 
     args = parser.parse_args()
+
     _, path = build_report_markdown(
         ticker=args.ticker,
         years=args.years,
         out_dir=args.out,
         include_concept_map=not args.no_concept_map,
+        generate_charts=not args.no_charts,
     )
     print(path)
 
