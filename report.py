@@ -1,13 +1,9 @@
-# report.py
 from __future__ import annotations
-
 import argparse
 import datetime as dt
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-
 import pandas as pd
-
 from sec_client import make_default_client
 from xbrl_normalize import normalize_pipeline
 from financials import FinancialsConfig, build_annual_financials_table, format_financials_for_display
@@ -297,7 +293,7 @@ def main() -> None:
     )
 
     parser.add_argument("--years", type=int, default=5, help="Number of fiscal years to include")
-    parser.add_argument("--out", default="reports", help="Output directory")
+    parser.add_argument("--out", default="output_reports", help="Output directory")
     parser.add_argument("--no-concept-map", action="store_true", help="Do not include concept map section")
     parser.add_argument("--no-charts", action="store_true", help="Do not generate charts")
 

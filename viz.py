@@ -1,9 +1,6 @@
-# viz.py
 from __future__ import annotations
-
 from pathlib import Path
 from typing import Dict, List, Tuple
-
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import pandas as pd
