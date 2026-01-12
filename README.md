@@ -47,29 +47,6 @@ Common files in this repo:
 - `export_sqlite.py`  
   Export annual metrics into a SQLite database for Tableau dashboards.
 
----
-
-## Quick Start
-
-### Generate a report for one company
-
-```bash
-python report.py --ticker AAPL --years 5
-```
-
-### Generate reports for multiple companies
-
-Comma-separated:
-
-```bash
-python report.py --tickers AAPL,MSFT,NVDA --years 5
-```
-
-Space-separated:
-
-```bash
-python report.py --tickers AAPL MSFT NVDA --years 5
-```
 
 ---
 
@@ -89,31 +66,11 @@ Or multiple:
 python report.py --tickers AAPL,MSFT,NVDA --years 5
 ```
 
-Optional flags:
+Default output folder depends on your `--out` setting.
 
-* Disable concept map:
+Typical outputs:
 
-```bash
-python report.py --ticker AAPL --years 5 --no-concept-map
-```
-
-* Disable charts:
-
-```bash
-python report.py --ticker AAPL --years 5 --no-charts
-```
-
-* Change output folder:
-
-```bash
-python report.py --ticker AAPL --years 5 --out output_reports
-```
-
-If your folder name contains spaces, wrap it in quotes:
-
-```bash
-python report.py --ticker AAPL --years 5 --out "output reports"
-```
+* `output_reports/AAPL.md`
 
 ### 2) Export to SQLite (Tableau-ready)
 
@@ -129,36 +86,7 @@ Export multiple tickers:
 python export_sqlite.py --tickers AAPL,MSFT,NVDA --years 5
 ```
 
----
-
-## Outputs
-
-### 1) Markdown report outputs
-
-Default output folder depends on your `--out` setting.
-
-Typical outputs:
-
-* `output_reports/AAPL.md`
-* `output_reports/MSFT.md`
-* `output_reports/NVDA.md`
-* `output_reports/index.md` (links to all generated reports)
-* `output_reports/assets/<TICKER>/*.png` (charts)
-
-### 2) SQLite outputs
-
 * `outputs/sec_fin.db`
-
-Tables:
-
-* `annual_long`
-  Long-format annual metrics for charting and BI tools.
-
-* `company_meta`
-  Company metadata (CIK, company name, latest FY, concept map).
-
-* `run_log`
-  Export run history.
 
 ---
 
@@ -208,10 +136,10 @@ Below is an example output for Apple (AAPL).
 
 | | |
 |---|---|
-| <b>Revenue</b><br><img src='assets/AAPL/revenue.png' width='100%'> | <b>Revenue YoY</b><br><img src='assets/AAPL/revenue_yoy.png' width='100%'> |
-| <b>Margins</b><br><img src='assets/AAPL/margins.png' width='100%'> | <b>Cash flow</b><br><img src='assets/AAPL/cash_flow.png' width='100%'> |
-| <b>Income statement levels</b><br><img src='assets/AAPL/income_statement.png' width='100%'> | <b>Balance sheet snapshot</b><br><img src='assets/AAPL/balance_sheet.png' width='100%'> |
-| <b>Cash flow quality</b><br><img src='assets/AAPL/cash_quality.png' width='100%'> | <b>Return on equity</b><br><img src='assets/AAPL/roe.png' width='100%'> |
+| <b>Revenue</b><br><img src='output_reports/assets/AAPL/revenue.png' width='100%'> | <b>Revenue YoY</b><br><img src='output_reports/assets/AAPL/revenue_yoy.png' width='100%'> |
+| <b>Margins</b><br><img src='output_reports/assets/AAPL/margins.png' width='100%'> | <b>Cash flow</b><br><img src='output_reports/assets/AAPL/cash_flow.png' width='100%'> |
+| <b>Income statement levels</b><br><img src='output_reports/assets/AAPL/income_statement.png' width='100%'> | <b>Balance sheet snapshot</b><br><img src='output_reports/assets/AAPL/balance_sheet.png' width='100%'> |
+| <b>Cash flow quality</b><br><img src='output_reports/assets/AAPL/cash_quality.png' width='100%'> | <b>Return on equity</b><br><img src='output_reports/assets/AAPL/roe.png' width='100%'> |
 
 ## Annual Financials Table
 USD in billions for level metrics
