@@ -1,13 +1,9 @@
-# export_sqlite.py
 from __future__ import annotations
-
 import argparse
 import os
 import sqlite3
 from datetime import datetime, timezone
-
 import pandas as pd
-
 from sec_client import make_default_client
 from xbrl_normalize import normalize_pipeline
 from financials import build_annual_financials_table, format_financials_for_display
