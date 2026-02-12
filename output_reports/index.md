@@ -1,7 +1,7 @@
 # Automated Financial Analysis Reports
 
-- Generated: 2026-02-12 14:16:44
-- Coverage: last 5 fiscal years
+- Generated: 2026-02-12 14:19:12
+- Coverage: last 10 fiscal years
 
 ## Reports
 
