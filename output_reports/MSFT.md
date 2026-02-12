@@ -1,7 +1,7 @@
 # MICROSOFT CORP - MSFT Automated Financial Analysis Report
 
 - CIK: `0000789019`
-- Generated: 2026-01-12 00:53:48
+- Generated: 2026-02-12 14:16:44
 - Coverage: last 5 fiscal years
 
 ## Highlights

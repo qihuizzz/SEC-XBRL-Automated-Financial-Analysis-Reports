@@ -1,7 +1,7 @@
 # Apple Inc. - AAPL Automated Financial Analysis Report
 
 - CIK: `0000320193`
-- Generated: 2026-01-12 00:53:47
+- Generated: 2026-01-26 17:02:02
 - Coverage: last 5 fiscal years
 
 ## Highlights
