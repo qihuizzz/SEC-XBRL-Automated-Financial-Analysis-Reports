@@ -1,8 +1,8 @@
 # Automated Financial Analysis Reports
 
-- Generated: 2026-02-12 14:20:55
-- Coverage: last 5 fiscal years
+- Generated: 2026-02-22 21:57:17
+- Coverage: last 10 fiscal years
 
 ## Reports
 
-- [MSFT](MSFT.md)
+- [GEN](GEN.md)
